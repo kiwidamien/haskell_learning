@@ -5,5 +5,6 @@ bondLikeIntro name = (last $ words name) ++ ". " ++ name
 -- bondLikeIntro "James Bond"    -- "Bond. James Bond"
 -- bondLikeIntro "Homer Simpson" -- "Simpson. Homer Simpson"
 
+-- Using >> to throw away the result, but keep going
 coolUserIntro :: IO ()
-coolUserIntro = putStrLn "Name?" >>= (\_ -> bondLikeIntro <$> getLine ) >>= putStrLn
+coolUserIntro = putStrLn "Name?" >> (bondLikeIntro <$> getLine ) >>= putStrLn

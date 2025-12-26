@@ -5,5 +5,6 @@ bondLikeIntro name = (last $ words name) ++ ". " ++ name
 -- bondLikeIntro "James Bond"    -- "Bond. James Bond"
 -- bondLikeIntro "Homer Simpson" -- "Simpson. Homer Simpson"
 
+-- Make the flow more apparent with using a lambda function
 coolUserIntro :: IO ()
-coolUserIntro = putStrLn "Name?" >>= (\_ -> bondLikeIntro <$> getLine ) >>= putStrLn
+coolUserIntro = putStrLn "Name?" >> getLine >>= (\name -> putStrLn $ bondLikeIntro name)

@@ -192,19 +192,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> bondLikeIntro <span class="op">&lt;$&gt;</span> name_from_user   <span class="co">-- same return, but uses infix operator</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Now let’s say we wanted to print this out. The REPL will do this for us automatically, but this wouldn’t work if we put it in a script. We want to use the function <code>putStrLn :: String -&gt; IO ()</code>.</p>
 <ul>
-<li>We have the <code>IO String</code>, <code>&lt;$&gt; bondLikeIntro name_from_user</code> that we want to print</li>
-<li>We have a function <code>String -&gt; IO ()</code></li>
+<li>We have the <code>IO String</code>, <code>bondLikeIntro &lt;$&gt; name_from_user</code> that we want to print</li>
+<li>We have a function <code>putStrLn :: String -&gt; IO ()</code></li>
 <li>So we have a monad like thing: <code>&gt;&gt;= :: (IO String) -&gt; (String -&gt; IO ()) -&gt; (IO ())</code></li>
 </ul>
 <p>We can’t “get” the string <code>"Simpson. Marge Simpson"</code> out of the <code>IO String</code>, but we can use the Monad to push <code>putStrLn</code> into the <code>IO</code> context the <code>IO String</code> already has:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (<span class="op">&gt;&gt;=</span>) (bondLikeIntro <span class="op">&lt;$&gt;</span> name_from_user) <span class="fu">putStrLn</span>  <span class="co">-- returns IO ()</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Simpson</span><span class="op">.</span> <span class="dt">Marge</span> <span class="dt">Simpson</span>                                   <span class="co">-- This is a printed side effect</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- equivalent infix:</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (bondLikeIntro <span class="op">&lt;$&gt;</span> name_from_user) <span class="op">&gt;&gt;=</span> <span class="fu">putStrLn</span>  <span class="co">-- returns IO ()</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (bondLikeIntro <span class="op">&lt;$&gt;</span> name_from_user) <span class="op">&gt;&gt;=</span> <span class="fu">putStrLn</span>    <span class="co">-- returns IO ()</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Simpson</span><span class="op">.</span> <span class="dt">Marge</span> <span class="dt">Simpson</span>                                   <span class="co">-- This is a printed side effect</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Finally, we can wrap this up into a total script as follows</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>{{<span class="op">&lt;</span> include bond_name<span class="op">.</span>hs <span class="op">&gt;</span>}}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>We did have to include one extra piece in here (the <code>&gt;&gt;</code> part), which we will explain next.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bondLikeIntro ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bondLikeIntro <span class="st">""</span> <span class="ot">=</span> <span class="st">""</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>bondLikeIntro name <span class="ot">=</span> (<span class="fu">last</span> <span class="op">$</span> <span class="fu">words</span> name) <span class="op">++</span> <span class="st">". "</span> <span class="op">++</span> name</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- Examples:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- bondLikeIntro "James Bond"    -- "Bond. James Bond"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- bondLikeIntro "Homer Simpson" -- "Simpson. Homer Simpson"</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ot">coolUserIntro ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>coolUserIntro <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">"Name?"</span> <span class="op">&gt;&gt;=</span> (\_ <span class="ot">-&gt;</span> bondLikeIntro <span class="op">&lt;$&gt;</span> <span class="fu">getLine</span> ) <span class="op">&gt;&gt;=</span> <span class="fu">putStrLn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We can run this in the interpreter as follows</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="op">:</span>l bond_name01</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> coolUserIntro </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Name</span><span class="op">?</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Damien</span> <span class="dt">Martin</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Martin</span><span class="op">.</span> <span class="dt">Damien</span> <span class="dt">Martin</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Through the rest of this chapter, we are going to tidy up our <code>coolUserIntro</code> function in different ways:</p>
+<ul>
+<li>Introducing the <code>&gt;&gt;</code> operator</li>
+<li>Sequencing more idiomatically</li>
+<li>Introducing the <code>do</code> notation</li>
+</ul>
 </section>
 </section>
 <section id="section" class="level2">

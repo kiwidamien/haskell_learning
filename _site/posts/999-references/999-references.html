@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -154,36 +120,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="monads-as-map-lookups" class="level1">
-<h1>Monads as Map Lookups</h1>
-<p>Suppose we had two maps:</p>
-<ul>
-<li><code>zipToCity :: M.Map Int String</code>. Given a zip code <code>Int</code>, return the city name <code>String</code>.</li>
-<li><code>cityToState :: M.Map String String</code>. Given a city name, return the state.</li>
-</ul>
-<p>This is not a great representation for this problem (in particular, the same city name can appear in many states, such as Springfield which exists in 34 states). We are going to assume that all our city names are unique, so this problem does not occur, so that we can make an example with minimal explaination.</p>
-<p>How would we write a function that, given a zip code, would tell you the State?</p>
-<p>Here is one work working example of the code:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Map</span> <span class="kw">as</span> <span class="dt">M</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">zipToCity ::</span> <span class="dt">M.Map</span> <span class="dt">Int</span> <span class="dt">String</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>zipToCity <span class="ot">=</span> M.fromList [(<span class="dv">95616</span>, <span class="st">"Davis"</span>), </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                        (<span class="dv">94102</span>, <span class="st">"San Francisco"</span>), (<span class="dv">94103</span>, <span class="st">"San Francisco"</span>), (<span class="dv">94014</span>, <span class="st">"San Francisco"</span>),</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                        (<span class="dv">30033</span>, <span class="st">"Atlanta"</span>), (<span class="dv">30301</span>, <span class="st">"Atlanta"</span>), (<span class="dv">30307</span>, <span class="st">"Atlanta"</span>)]</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ot">cityToState ::</span> <span class="dt">M.Map</span> <span class="dt">String</span> <span class="dt">String</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>cityToState <span class="ot">=</span> M.fromList [(<span class="st">"Davis"</span>, <span class="st">"CA"</span>), (<span class="st">"San Francisco"</span>, <span class="st">"CA"</span>), (<span class="st">"Atlanta"</span>, <span class="st">"GA"</span>)]</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ot">useZipCodeFindState ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">String</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>useZipCodeFindState zipCode <span class="ot">=</span> <span class="kw">case</span> M.lookup zipCode zipToCity <span class="kw">of</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Nothing</span> <span class="ot">-&gt;</span> <span class="dt">Nothing</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> cityName <span class="ot">-&gt;</span> M.lookup cityName cityToState</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Thi ## References</p>
-<p>This approach to introducing Monads was inspired by <em>Get Programming With Haskell</em> by William Kurt.</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

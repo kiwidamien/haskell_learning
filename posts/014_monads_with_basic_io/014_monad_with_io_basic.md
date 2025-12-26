@@ -14,7 +14,7 @@ f maybeA = case maybeA of
 
 So while we don't "take the `a` out of `Maybe a`", we can use `case` to make a branch and operate on the `a` as above. It doesn't feel that much wierder than the bind solution `f maybeA = anA >>= g`.
 
-When using the `IO`
+When using the `IO` 
 
 
 ## Example 
@@ -52,8 +52,8 @@ ghci> bondLikeIntro <$> name_from_user   -- same return, but uses infix operator
 
 Now let's say we wanted to print this out. The REPL will do this for us automatically, but this wouldn't work if we put it in a script. We want to use the function `putStrLn :: String -> IO ()`. 
 
-* We have the `IO String`, `<$> bondLikeIntro name_from_user` that we want to print
-* We have a function `String -> IO ()`
+* We have the `IO String`, `bondLikeIntro <$> name_from_user` that we want to print
+* We have a function `putStrLn :: String -> IO ()`
 * So we have a monad like thing: `>>= :: (IO String) -> (String -> IO ()) -> (IO ())`
 
 We can't "get" the string `"Simpson. Marge Simpson"` out of the `IO String`, but we can use the Monad to push `putStrLn` into the `IO` context the `IO String` already has:
@@ -61,16 +61,29 @@ We can't "get" the string `"Simpson. Marge Simpson"` out of the `IO String`, but
 ghci> (>>=) (bondLikeIntro <$> name_from_user) putStrLn  -- returns IO ()
 Simpson. Marge Simpson                                   -- This is a printed side effect
 -- equivalent infix:
-ghci> (bondLikeIntro <$> name_from_user) >>= putStrLn  -- returns IO ()
+ghci> (bondLikeIntro <$> name_from_user) >>= putStrLn    -- returns IO ()
 Simpson. Marge Simpson                                   -- This is a printed side effect
 ```
 
 Finally, we can wrap this up into a total script as follows
 
 ```haskell
-{{< include bond_name.hs >}}
+{{< include bond_name01.hs >}}
+```
+We can run this in the interpreter as follows
+```haskell
+ghci> :l bond_name01
+ghci> coolUserIntro 
+Name?
+Damien Martin
+Martin. Damien Martin
 ```
 
-We did have to include one extra piece in here (the `>>` part), which we will explain next.
+Through the rest of this chapter, we are going to tidy up our `coolUserIntro` function in different ways:
+
+* Introducing the `>>` operator
+* Sequencing more idiomatically
+* Introducing the `do` notation
+
 
 ## 
