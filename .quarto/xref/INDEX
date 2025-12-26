@@ -1,0 +1,38 @@
+{
+  "posts/post-with-code/index.qmd": {
+    "index.html": "7edab0e4"
+  },
+  "posts/013_monads_as_map_lookup/monad_as_map_lookup.md": {
+    "monad_as_map_lookup.html": "d5018731"
+  },
+  "posts/001_getting_started.md": {
+    "001_getting_started.html": "3095361b"
+  },
+  "posts/welcome/index.qmd": {
+    "index.html": "d437f08d"
+  },
+  "posts/002_functions_and_types.md": {
+    "002_functions_and_types.html": "13f773ff"
+  },
+  "posts/010_functors/010_functors.md": {
+    "010_functors.html": "de1ae73d"
+  },
+  "posts/011_applicative/applicatives.md": {
+    "applicatives.html": "640b4803"
+  },
+  "index.qmd": {
+    "index.html": "842f8e31"
+  },
+  "about.qmd": {
+    "about.html": "26122bf4"
+  },
+  "posts/013_monads_as_map_lookup/013_monad_as_map_lookup.md": {
+    "013_monad_as_map_lookup.html": "38fef2ac"
+  },
+  "posts/014_monads_with_basic_io/014_monad_with_io_basic.md": {
+    "014_monad_with_io_basic.html": "5ff867ca"
+  },
+  "posts/011_applicative/011_applicatives.md": {
+    "011_applicatives.html": "2f047025"
+  }
+}
